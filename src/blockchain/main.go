@@ -126,7 +126,7 @@ func main(){
 	blockchain := new(BlockChain)
 
 	InitialBlock := new(Block)
-	InitialBlock.Initial(0, "genesis", "genesis")
+	InitialBlock.Initial(0, "none", "none")
 	blockchain.Insert(*InitialBlock)
 
 	SecondBlock := new(Block)
