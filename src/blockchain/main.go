@@ -122,6 +122,7 @@ func (c BlockChain) DecodeFromJSON(data string) (BlockChain, error) {
 
 
 
+
 func main(){
 	blockchain := new(BlockChain)
 
