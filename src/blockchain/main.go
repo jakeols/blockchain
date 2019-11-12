@@ -6,7 +6,13 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"log"
+	"net/http"
+	"os"
 	"time"
+
+	"./uri"
+	"./uri/handlers"
 )
 
 type Block struct {
@@ -137,4 +143,19 @@ func main() {
 
 	JSONBlockchain, _ := blockchain.EncodeToJSON()
 	fmt.Println(JSONBlockchain)
+
+	// communication
+
+	router := uri.NewRouter()
+
+	var port string
+	if len(os.Args) > 1 {
+		port = os.Args[1]
+	} else {
+		port = "6689"
+	}
+
+	handlers.InitSelfAddress(port)
+
+	log.Fatal(http.ListenAndServe(":"+port, router))
 }
