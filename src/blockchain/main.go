@@ -9,6 +9,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"strconv"
 	"time"
 
 	"./uri"
@@ -26,18 +27,22 @@ type Header struct {
 	Hash       string
 	ParentHash string
 	Size       int32
+	Nonce      string
 }
 
 // initializes a new block, uses hash of JSON value as header hash
-func (b *Block) Initial(height int32, parentHash string, value string) {
+func (b *Block) Initial(height int32, parentHash string, value string, nonce string) {
 
 	b.Value = value
+
+	// find the nonce here
 
 	b.Header = Header{
 		Height:     height,
 		Timestamp:  time.Now().UnixNano(),
 		ParentHash: parentHash,
 		Size:       32,
+		Nonce:      nonce,
 	}
 
 	// set hash
@@ -46,6 +51,33 @@ func (b *Block) Initial(height int32, parentHash string, value string) {
 	hash.Write([]byte(JSONString))
 	md := hash.Sum(nil)
 	b.Header.Hash = hex.EncodeToString(md)
+
+}
+
+func FindNonce(parentHash string) {
+	// should have 10 0's
+	var nonceFound bool = false
+
+	var counter int = 1 // we should start this at a random value later
+	for nonceFound == false {
+		hash := sha256.New()
+		var testString string = "12345"
+		hash.Write([]byte(strconv.Itoa(counter)))
+
+		hash.Write([]byte(testString))
+		// also write block hash here maybe
+		md := hash.Sum(nil)
+		fmt.Println("New hash generated: ")
+		fmt.Println(len(md))
+
+		// determine if it starts with 10 0's
+		// if bits.LeadingZeros8(md) == 10 {
+		// 	fmt.Println("Nonce found")
+		// 	nonceFound = true
+		// }
+		counter++
+
+	}
 
 }
 
@@ -130,19 +162,21 @@ func main() {
 	blockchain := new(BlockChain)
 
 	InitialBlock := new(Block)
-	InitialBlock.Initial(0, "none", "none")
+	InitialBlock.Initial(0, "none", "none", "none")
 	blockchain.Insert(*InitialBlock)
 
 	SecondBlock := new(Block)
-	SecondBlock.Initial(1, blockchain.Chain[blockchain.Length-1][0].Header.Hash, "tx vals")
+	SecondBlock.Initial(1, blockchain.Chain[blockchain.Length-1][0].Header.Hash, "tx vals", "nonce")
 	blockchain.Insert(*SecondBlock)
 
 	ThirdBlock := new(Block)
-	ThirdBlock.Initial(2, blockchain.Chain[blockchain.Length-1][0].Header.Hash, "more tx vals")
+	ThirdBlock.Initial(2, blockchain.Chain[blockchain.Length-1][0].Header.Hash, "more tx vals", "nonce")
 	blockchain.Insert(*ThirdBlock)
 
 	JSONBlockchain, _ := blockchain.EncodeToJSON()
 	fmt.Println(JSONBlockchain)
+
+	FindNonce("10")
 
 	// communication
 
