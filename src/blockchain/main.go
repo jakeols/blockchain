@@ -1,39 +1,39 @@
 package main
 
 import (
-	"fmt"
-	"time"
-	"errors"
 	"crypto/sha256"
 	"encoding/hex"
 	"encoding/json"
+	"errors"
+	"fmt"
+	"time"
 )
 
 type Block struct {
 	Header Header
-	Value string
+	Value  string
 }
 
 type Header struct {
-	Height int32
-	Timestamp int64
-	Hash string
+	Height     int32
+	Timestamp  int64
+	Hash       string
 	ParentHash string
-	Size int32
+	Size       int32
 }
 
 // initializes a new block, uses hash of JSON value as header hash
-func (b *Block ) Initial(height int32, parentHash string, value string) {
-	
-	b.Value = value	
+func (b *Block) Initial(height int32, parentHash string, value string) {
+
+	b.Value = value
 
 	b.Header = Header{
-		Height: height,
-		Timestamp: time.Now().UnixNano(),
+		Height:     height,
+		Timestamp:  time.Now().UnixNano(),
 		ParentHash: parentHash,
-		Size: 32,
+		Size:       32,
 	}
-	
+
 	// set hash
 	hash := sha256.New()
 	JSONString, _ := b.EncodeToJSON()
@@ -50,7 +50,7 @@ func (b Block) DecodeFromJSON(data string) (Block, error) {
 	return NewBlock, err
 }
 
-// encodes a block to JSON 
+// encodes a block to JSON
 func (b Block) EncodeToJSON() (string, error) {
 	var JSONData []byte
 	JSONData, err := json.Marshal(b)
@@ -58,16 +58,16 @@ func (b Block) EncodeToJSON() (string, error) {
 }
 
 type BlockChain struct {
-	Chain map[int32][]Block
+	Chain  map[int32][]Block
 	Length int32
 }
 
-func (c BlockChain) Get(height int32) ([]Block) {
-		return c.Chain[height]
+func (c BlockChain) Get(height int32) []Block {
+	return c.Chain[height]
 }
 
 func (c *BlockChain) Insert(block Block) error {
-	
+
 	if c.Length == 0 {
 		newChain := make(map[int32][]Block)
 		c.Chain = newChain
@@ -90,14 +90,14 @@ func (c *BlockChain) Insert(block Block) error {
 	c.Length = int32(len(c.Chain))
 	return nil
 
-}	
+}
 
 func (c BlockChain) EncodeToJSON() (string, error) {
-	
+
 	blockchain := make([]Block, 0)
 
 	for index := 0; index < int(c.Length); index++ {
-		
+
 		block := c.Chain[int32(index)][0]
 		blockchain = append(blockchain, block)
 	}
@@ -120,10 +120,7 @@ func (c BlockChain) DecodeFromJSON(data string) (BlockChain, error) {
 	return c, err
 }
 
-
-
-
-func main(){
+func main() {
 	blockchain := new(BlockChain)
 
 	InitialBlock := new(Block)
@@ -133,7 +130,7 @@ func main(){
 	SecondBlock := new(Block)
 	SecondBlock.Initial(1, blockchain.Chain[blockchain.Length-1][0].Header.Hash, "tx vals")
 	blockchain.Insert(*SecondBlock)
-	
+
 	ThirdBlock := new(Block)
 	ThirdBlock.Initial(2, blockchain.Chain[blockchain.Length-1][0].Header.Hash, "more tx vals")
 	blockchain.Insert(*ThirdBlock)
