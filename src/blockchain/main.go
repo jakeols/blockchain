@@ -31,7 +31,7 @@ type Header struct {
 }
 
 // initializes a new block, uses hash of JSON value as header hash
-func (b *Block) Initial(height int32, parentHash string, value string, nonce string) {
+func (b *Block) Initial(height int32, parentHash string, value string) {
 
 	b.Value = value
 
@@ -42,7 +42,7 @@ func (b *Block) Initial(height int32, parentHash string, value string, nonce str
 		Timestamp:  time.Now().UnixNano(),
 		ParentHash: parentHash,
 		Size:       32,
-		Nonce:      nonce,
+		Nonce:      FindNonce(parentHash),
 	}
 
 	// set hash
@@ -54,10 +54,10 @@ func (b *Block) Initial(height int32, parentHash string, value string, nonce str
 
 }
 
-func FindNonce(parentHash string) {
+func FindNonce(parentHash string) string {
 	// should have 10 0's
 	var nonceFound bool = false
-
+	var hashString string
 	for nonceFound == false {
 		var counter string = time.Now().String() // maybe make more random in future
 
@@ -69,18 +69,17 @@ func FindNonce(parentHash string) {
 		// also write block hash here maybe
 		md := hash.Sum(nil)
 
-		hashString := hex.EncodeToString(md)
-
-		fmt.Println("New hash generated: ")
-		fmt.Println(hashString)
+		hashString = hex.EncodeToString(md)
 
 		// determine if it starts with 10 0's
-		if strings.HasPrefix(hashString, strings.Repeat("0", 3)) {
-			fmt.Println("Nonce found")
+		if strings.HasPrefix(hashString, strings.Repeat("0", 2)) {
 			nonceFound = true
+			break
 		}
 
 	}
+
+	return hashString
 
 }
 
@@ -165,15 +164,15 @@ func main() {
 	blockchain := new(BlockChain)
 
 	InitialBlock := new(Block)
-	InitialBlock.Initial(0, "none", "none", "none")
+	InitialBlock.Initial(0, "none", "none")
 	blockchain.Insert(*InitialBlock)
 
 	SecondBlock := new(Block)
-	SecondBlock.Initial(1, blockchain.Chain[blockchain.Length-1][0].Header.Hash, "tx vals", "nonce")
+	SecondBlock.Initial(1, blockchain.Chain[blockchain.Length-1][0].Header.Hash, "tx vals")
 	blockchain.Insert(*SecondBlock)
 
 	ThirdBlock := new(Block)
-	ThirdBlock.Initial(2, blockchain.Chain[blockchain.Length-1][0].Header.Hash, "more tx vals", "nonce")
+	ThirdBlock.Initial(2, blockchain.Chain[blockchain.Length-1][0].Header.Hash, "more tx vals")
 	blockchain.Insert(*ThirdBlock)
 
 	JSONBlockchain, _ := blockchain.EncodeToJSON()
