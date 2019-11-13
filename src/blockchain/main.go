@@ -9,6 +9,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"strconv"
 	"strings"
 	"time"
 
@@ -42,7 +43,7 @@ func (b *Block) Initial(height int32, parentHash string, value string) {
 		Timestamp:  time.Now().UnixNano(),
 		ParentHash: parentHash,
 		Size:       32,
-		Nonce:      FindNonce(parentHash),
+		Nonce:      FindNonce(parentHash, value),
 	}
 
 	// set hash
@@ -54,28 +55,33 @@ func (b *Block) Initial(height int32, parentHash string, value string) {
 
 }
 
-func FindNonce(parentHash string) string {
+func FindNonce(parentHash string, value string) string {
 	// should have 10 0's
 	var nonceFound bool = false
 	var hashString string
+	var counter int = 1 // maybe make more random in future
 	for nonceFound == false {
-		var counter string = time.Now().String() // maybe make more random in future
 
 		hash := sha256.New()
-		var testString string = "12345"
-		hash.Write([]byte(counter))
+		hash.Write([]byte(strconv.Itoa(counter)))
 
-		hash.Write([]byte(testString))
+		hash.Write([]byte(value))
 		// also write block hash here maybe
-		md := hash.Sum(nil)
+		//md := hash.Sum(nil)
+		fmt.Println("Difficulty")
 
-		hashString = hex.EncodeToString(md)
+		hashString = fmt.Sprintf("%x", hash.Sum(nil))
+
+		fmt.Println(hashString)
 
 		// determine if it starts with 10 0's
 		if strings.HasPrefix(hashString, strings.Repeat("0", 2)) {
 			nonceFound = true
 			break
 		}
+		counter++
+
+		hash.Reset()
 
 	}
 
@@ -177,8 +183,6 @@ func main() {
 
 	JSONBlockchain, _ := blockchain.EncodeToJSON()
 	fmt.Println(JSONBlockchain)
-
-	FindNonce("10")
 
 	// communication
 
