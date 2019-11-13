@@ -9,7 +9,7 @@ import (
 	"log"
 	"net/http"
 	"os"
-	"strconv"
+	"strings"
 	"time"
 
 	"./uri"
@@ -58,24 +58,27 @@ func FindNonce(parentHash string) {
 	// should have 10 0's
 	var nonceFound bool = false
 
-	var counter int = 1 // we should start this at a random value later
 	for nonceFound == false {
+		var counter string = time.Now().String() // maybe make more random in future
+
 		hash := sha256.New()
 		var testString string = "12345"
-		hash.Write([]byte(strconv.Itoa(counter)))
+		hash.Write([]byte(counter))
 
 		hash.Write([]byte(testString))
 		// also write block hash here maybe
 		md := hash.Sum(nil)
+
+		hashString := hex.EncodeToString(md)
+
 		fmt.Println("New hash generated: ")
-		fmt.Println(len(md))
+		fmt.Println(hashString)
 
 		// determine if it starts with 10 0's
-		// if bits.LeadingZeros8(md) == 10 {
-		// 	fmt.Println("Nonce found")
-		// 	nonceFound = true
-		// }
-		counter++
+		if strings.HasPrefix(hashString, strings.Repeat("0", 3)) {
+			fmt.Println("Nonce found")
+			nonceFound = true
+		}
 
 	}
 
