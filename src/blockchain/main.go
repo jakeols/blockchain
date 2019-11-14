@@ -7,6 +7,7 @@ import (
 	"errors"
 	"fmt"
 	"log"
+	"math/rand"
 	"net/http"
 	"os"
 	"strconv"
@@ -28,15 +29,13 @@ type Header struct {
 	Hash       string
 	ParentHash string
 	Size       int32
-	Nonce      string
+	Nonce      int
 }
 
 // initializes a new block, uses hash of JSON value as header hash
 func (b *Block) Initial(height int32, parentHash string, value string) {
 
 	b.Value = value
-
-	// find the nonce here
 
 	b.Header = Header{
 		Height:     height,
@@ -55,24 +54,17 @@ func (b *Block) Initial(height int32, parentHash string, value string) {
 
 }
 
-func FindNonce(parentHash string, value string) string {
-	// should have 10 0's
+func FindNonce(parentHash string, value string) int {
 	var nonceFound bool = false
 	var hashString string
-	var counter int = 1 // maybe make more random in future
+	var counter int = rand.Intn(200) // maybe make more random in future
 	for nonceFound == false {
 
 		hash := sha256.New()
+		hash.Write([]byte(parentHash))
 		hash.Write([]byte(strconv.Itoa(counter)))
-
 		hash.Write([]byte(value))
-		// also write block hash here maybe
-		//md := hash.Sum(nil)
-		fmt.Println("Difficulty")
-
-		hashString = fmt.Sprintf("%x", hash.Sum(nil))
-
-		fmt.Println(hashString)
+		hashString = hex.EncodeToString(hash.Sum(nil))
 
 		// determine if it starts with 10 0's
 		if strings.HasPrefix(hashString, strings.Repeat("0", 2)) {
@@ -84,8 +76,21 @@ func FindNonce(parentHash string, value string) string {
 		hash.Reset()
 
 	}
+	return counter
+}
 
-	return hashString
+func CheckNonce(nonce int, parentHash string, value string) bool {
+	hash := sha256.New()
+	hash.Write([]byte(parentHash))
+	hash.Write([]byte(strconv.Itoa(nonce)))
+	hash.Write([]byte(value))
+
+	hashString := hex.EncodeToString(hash.Sum(nil))
+
+	if strings.HasPrefix(hashString, strings.Repeat("0", 2)) {
+		return true
+	}
+	return false
 
 }
 
@@ -120,21 +125,28 @@ func (c *BlockChain) Insert(block Block) error {
 		c.Length = 0
 	}
 
-	height := block.Header.Height
-	LastBlock := c.Chain[height]
+	// check nonce here
+	// need nonce, parentHash, and value
+	if CheckNonce(block.Header.Nonce, block.Header.ParentHash, block.Value) == true || c.Length == 0 {
+		height := block.Header.Height
+		LastBlock := c.Chain[height]
 
-	for _, v := range LastBlock {
-		if v.Header.Hash == block.Header.Hash {
-			return errors.New("cannot insert block.")
+		for _, v := range LastBlock {
+			if v.Header.Hash == block.Header.Hash {
+				return errors.New("cannot insert block.")
+			}
 		}
+
+		location := c.Chain[height]
+
+		c.Chain[height] = append(location, block)
+
+		c.Length = int32(len(c.Chain))
+		return nil
+
 	}
-
-	location := c.Chain[height]
-
-	c.Chain[height] = append(location, block)
-
-	c.Length = int32(len(c.Chain))
-	return nil
+	// don't accept the block
+	return errors.New("nonce invalid")
 
 }
 
