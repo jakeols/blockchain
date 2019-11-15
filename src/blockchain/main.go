@@ -6,15 +6,9 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"log"
-	"net/http"
-	"os"
 	"strconv"
 	"strings"
 	"time"
-
-	"./uri"
-	"./uri/handlers"
 )
 
 type Block struct {
@@ -61,19 +55,16 @@ func FindNonce(parentHash string, value string) int {
 
 		hash := sha256.New()
 		hash.Write([]byte(parentHash + strconv.Itoa(counter) + value))
-		//hashString = hex.EncodeToString(hash.Sum(nil))
 		sha256Bytes := sha256.Sum256(hash.Sum(nil))
 
-		//fmt.Println("SHA256 String is ", hex.EncodeToString(sha256Bytes[:]))
-
 		s := fmt.Sprintf("%08b", sha256Bytes[:])
-		n := strings.Trim(s, "[\t]")
-		fmt.Println(n)
+		n := strings.Trim(s, "[]")
+		t := strings.Replace(n, "\t", "", -1)
 
-		//fmt.Println(bytes.Equal([]byte(hashString), []byte("0000000000")))
+		//fmt.Println(t)
 
-		// determine if it starts with 10 0's
-		if strings.HasPrefix(n, strings.Repeat("0", 8)) {
+		// determine if it starts with 8 0's
+		if strings.HasPrefix(t, strings.Repeat("0", 8)) {
 			nonceFound = true
 			break
 		}
@@ -87,13 +78,14 @@ func FindNonce(parentHash string, value string) int {
 
 func CheckNonce(nonce int, parentHash string, value string) bool {
 	hash := sha256.New()
-	hash.Write([]byte(parentHash))
-	hash.Write([]byte(strconv.Itoa(nonce)))
-	hash.Write([]byte(value))
+	hash.Write([]byte(parentHash + strconv.Itoa(nonce) + value))
+	sha256Bytes := sha256.Sum256(hash.Sum(nil))
 
-	hashString := hex.EncodeToString(hash.Sum(nil))
+	s := fmt.Sprintf("%08b", sha256Bytes[:])
+	n := strings.Trim(s, "[]")
+	t := strings.Replace(n, "\t", "", -1)
 
-	if strings.HasPrefix(hashString, strings.Repeat("0", 2)) {
+	if strings.HasPrefix(t, strings.Repeat("0", 8)) {
 		return true
 	}
 	return false
@@ -204,16 +196,16 @@ func main() {
 
 	// communication
 
-	router := uri.NewRouter()
+	// router := uri.NewRouter()
 
-	var port string
-	if len(os.Args) > 1 {
-		port = os.Args[1]
-	} else {
-		port = "6689"
-	}
+	// var port string
+	// if len(os.Args) > 1 {
+	// 	port = os.Args[1]
+	// } else {
+	// 	port = "6689"
+	// }
 
-	handlers.InitSelfAddress(port)
+	// handlers.InitSelfAddress(port)
 
-	log.Fatal(http.ListenAndServe(":"+port, router))
+	// log.Fatal(http.ListenAndServe(":"+port, router))
 }
