@@ -59,12 +59,10 @@ func FindNonce(parentHash string, value string) int {
 
 		s := fmt.Sprintf("%08b", sha256Bytes[:])
 		n := strings.Trim(s, "[]")
-		t := strings.Replace(n, "\t", "", -1)
+		t := strings.Replace(n, " ", "", -1)
 
-		//fmt.Println(t)
-
-		// determine if it starts with 8 0's
-		if strings.HasPrefix(t, strings.Repeat("0", 8)) {
+		// determine if it starts with 10 0's
+		if strings.HasPrefix(t, strings.Repeat("0", 10)) {
 			nonceFound = true
 			break
 		}
@@ -83,9 +81,9 @@ func CheckNonce(nonce int, parentHash string, value string) bool {
 
 	s := fmt.Sprintf("%08b", sha256Bytes[:])
 	n := strings.Trim(s, "[]")
-	t := strings.Replace(n, "\t", "", -1)
+	t := strings.Replace(n, " ", "", -1)
 
-	if strings.HasPrefix(t, strings.Repeat("0", 8)) {
+	if strings.HasPrefix(t, strings.Repeat("0", 10)) {
 		return true
 	}
 	return false
