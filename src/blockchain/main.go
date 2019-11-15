@@ -7,7 +7,6 @@ import (
 	"errors"
 	"fmt"
 	"log"
-	"math/rand"
 	"net/http"
 	"os"
 	"strconv"
@@ -56,18 +55,25 @@ func (b *Block) Initial(height int32, parentHash string, value string) {
 
 func FindNonce(parentHash string, value string) int {
 	var nonceFound bool = false
-	var hashString string
-	var counter int = rand.Intn(200) // maybe make more random in future
+	//var hashString string
+	var counter int = 0 // maybe make more random in future
 	for nonceFound == false {
 
 		hash := sha256.New()
-		hash.Write([]byte(parentHash))
-		hash.Write([]byte(strconv.Itoa(counter)))
-		hash.Write([]byte(value))
-		hashString = hex.EncodeToString(hash.Sum(nil))
+		hash.Write([]byte(parentHash + strconv.Itoa(counter) + value))
+		//hashString = hex.EncodeToString(hash.Sum(nil))
+		sha256Bytes := sha256.Sum256(hash.Sum(nil))
+
+		//fmt.Println("SHA256 String is ", hex.EncodeToString(sha256Bytes[:]))
+
+		s := fmt.Sprintf("%08b", sha256Bytes[:])
+		n := strings.Trim(s, "[\t]")
+		fmt.Println(n)
+
+		//fmt.Println(bytes.Equal([]byte(hashString), []byte("0000000000")))
 
 		// determine if it starts with 10 0's
-		if strings.HasPrefix(hashString, strings.Repeat("0", 2)) {
+		if strings.HasPrefix(n, strings.Repeat("0", 8)) {
 			nonceFound = true
 			break
 		}
