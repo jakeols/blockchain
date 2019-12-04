@@ -1,4 +1,4 @@
-package uri
+package main
 
 import (
 	"log"

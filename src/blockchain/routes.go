@@ -1,9 +1,7 @@
-package uri
+package main
 
 import (
 	"net/http"
-
-	"./handlers"
 )
 
 type Route struct {
@@ -20,30 +18,30 @@ var routes = Routes{
 		"ReceiveBlock",
 		"POST",
 		"/block/receive/",
-		handlers.ReceiveBlock,
+		ReceiveBlock,
 	},
 	Route{
 		"Register",
 		"GET",
 		"/peer",
-		handlers.Register,
+		Register,
 	},
 	Route{
 		"Start",
 		"GET",
 		"/start",
-		handlers.Start,
+		Start,
 	},
 	Route{
 		"Upload",
 		"GET",
 		"/upload",
-		handlers.Upload,
+		Upload,
 	},
 	Route{
 		"ReturnBlock",
 		"GET",
 		"/block/{height}/{hash}",
-		handlers.ReturnBlock,
+		ReturnBlock,
 	},
 }

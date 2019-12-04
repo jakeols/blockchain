@@ -1,4 +1,4 @@
-package handlers
+package main
 
 import (
 	"io/ioutil"
@@ -41,18 +41,24 @@ func ReceiveBlock(w http.ResponseWriter, r *http.Request) {
 }
 
 func Register(w http.ResponseWriter, r *http.Request) {
-	if r.Method == http.MethodGet {
-		w.WriteHeader(http.StatusOK)
-		_, _ = w.Write([]byte("getting peerlist"))
-	}
-	w.WriteHeader(http.StatusMethodNotAllowed)
+	w.WriteHeader(http.StatusOK)
+	sb := strings.Builder{}
+	sb.WriteString(r.RemoteAddr)
+	// add this to my peerlist
+	_, _ = w.Write([]byte(sb.String()))
+
 }
 
 func Start(w http.ResponseWriter, r *http.Request) {
 
 }
 
+// returns blockchain
 func Upload(w http.ResponseWriter, r *http.Request) {
+	// w.WriteHeader(http.StatusOK)
+	// if err := json.NewEncoder(w).Encode(CanonicalChain); err != nil {
+	// 	panic(err)
+	// }
 
 }
 
