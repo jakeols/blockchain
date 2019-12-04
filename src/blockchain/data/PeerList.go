@@ -5,7 +5,4 @@ type Peer struct {
 	IP string
 }
 
-type PeerList struct {
-	Peers  []Peer
-	Length uint32
-}
+type PeerList []Peer

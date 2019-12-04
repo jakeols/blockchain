@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"strings"
 
+	data "./data"
 	"github.com/pkg/errors"
 )
 
@@ -44,6 +45,11 @@ func Register(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
 	sb := strings.Builder{}
 	sb.WriteString(r.RemoteAddr)
+	// create a new peer
+	newPeer := new(data.Peer)
+	newPeer.ID = r.RemoteAddr
+
+	CurrentPeerList = append(CurrentPeerList, *newPeer)
 	// add this to my peerlist
 	_, _ = w.Write([]byte(sb.String()))
 

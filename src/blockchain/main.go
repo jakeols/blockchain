@@ -4,7 +4,11 @@ import (
 	"log"
 	"net/http"
 	"os"
+
+	"./data/"
 )
+
+var CurrentPeerList = data.PeerList{}
 
 func main() {
 
