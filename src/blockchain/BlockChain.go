@@ -74,3 +74,15 @@ func (c BlockChain) DecodeFromJSON(data string) (BlockChain, error) {
 
 	return c, err
 }
+
+func (c BlockChain) GetLatestBlocks(height int32) ([]Block, error) {
+
+	return c.Chain[height], nil
+
+}
+
+// func (c BlockChain) GetParentBlock(b Block) Block {
+// 	parentHeight := b.Header.Height - 1
+
+// 	return c.Chain[parentHeight]
+// }
