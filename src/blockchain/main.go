@@ -12,6 +12,7 @@ import (
 
 func main() {
 	blockchain := new(BlockChain)
+	blockchain.GenesisBlock()
 
 	InitialBlock := new(Block)
 	InitialBlock.Initial(0, "none", "none")

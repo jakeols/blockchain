@@ -47,3 +47,15 @@ func Register(w http.ResponseWriter, r *http.Request) {
 	}
 	w.WriteHeader(http.StatusMethodNotAllowed)
 }
+
+func Start(w http.ResponseWriter, r *http.Request) {
+
+}
+
+func Upload(w http.ResponseWriter, r *http.Request) {
+
+}
+
+func ReturnBlock(w http.ResponseWriter, r *http.Request) {
+
+}

@@ -28,4 +28,22 @@ var routes = Routes{
 		"/peer",
 		handlers.Register,
 	},
+	Route{
+		"Start",
+		"GET",
+		"/start",
+		handlers.Start,
+	},
+	Route{
+		"Upload",
+		"GET",
+		"/upload",
+		handlers.Upload,
+	},
+	Route{
+		"ReturnBlock",
+		"GET",
+		"/block/{height}/{hash}",
+		handlers.ReturnBlock,
+	},
 }

@@ -81,6 +81,11 @@ func (c BlockChain) GetLatestBlocks(height int32) ([]Block, error) {
 
 }
 
+// creates a genesis block, adds it to chain
+func (c BlockChain) GenesisBlock() {
+
+}
+
 // func (c BlockChain) GetParentBlock(b Block) Block {
 // 	parentHeight := b.Header.Height - 1
 
