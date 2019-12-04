@@ -46,4 +46,16 @@ var routes = Routes{
 		"/oddoreven",
 		handlers.OddOrEven,
 	},
+	Route{
+		"ReceiveBlock",
+		"POST",
+		"/block/receive/",
+		handlers.ReceiveBlock,
+	},
+	Route{
+		"Register",
+		"GET",
+		"/peer",
+		handlers.Register,
+	},
 }
