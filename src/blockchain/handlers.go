@@ -5,9 +5,11 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net/http"
+	"strconv"
 	"strings"
 
 	data "./data"
+	"github.com/gorilla/mux"
 	"github.com/pkg/errors"
 )
 
@@ -107,6 +109,22 @@ func Upload(w http.ResponseWriter, r *http.Request) {
 // gets block at /block/{height}/{hash}
 func ReturnBlock(w http.ResponseWriter, r *http.Request) {
 
+	height := mux.Vars(r)["height"]
+	hash := mux.Vars(r)["hash"]
+
+	heightInt, error := strconv.Atoi(height)
+	if error == nil { // height works
+		blocks, _ := CurrentBlockChain.GetLatestBlocks(int32(heightInt))
+		for _, block := range blocks {
+			if block.Header.Hash == hash {
+				w.WriteHeader(http.StatusOK)
+				json.NewEncoder(w).Encode(block)
+			}
+		}
+	} else {
+		w.WriteHeader(http.StatusNoContent)
+
+	}
 }
 
 func CanonicalChain(w http.ResponseWriter, r *http.Request) {
