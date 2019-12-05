@@ -26,20 +26,21 @@ func readRequestBody(r *http.Request) (string, error) {
 }
 
 func ReceiveBlock(w http.ResponseWriter, r *http.Request) {
-	// receive block
-	if r.Method == http.MethodPost {
-
-		requestBody, err := readRequestBody(r)
-		if err != nil {
-			w.WriteHeader(http.StatusBadRequest)
-		}
-		w.WriteHeader(http.StatusOK)
-		sb := strings.Builder{}
-		sb.WriteString("In simple post, received request body is: \n")
-		sb.WriteString(requestBody)
-		_, _ = w.Write([]byte(sb.String()))
+	// get new block JSON
+	reqBody, err := readRequestBody(r)
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
 	}
-	w.WriteHeader(http.StatusMethodNotAllowed)
+	newBlockData := new(data.BlockData)
+	newBlockData.DecodeFromJSON(reqBody)
+	// insert it into our blockchain
+	newBlock := new(data.Block)
+	newBlock.DecodeFromJSON(newBlockData.BlockJSON)
+
+	error := CurrentBlockChain.Insert(*newBlock)
+	if error != nil {
+		w.WriteHeader(http.StatusBadRequest)
+	}
 }
 
 // register to peer list
@@ -50,9 +51,10 @@ func Register(w http.ResponseWriter, r *http.Request) {
 	// create a new peer
 	newPeer := new(data.Peer)
 	newPeer.ID = r.RemoteAddr
-
-	CurrentPeerList = append(CurrentPeerList, *newPeer)
 	// add this to my peerlist
+	CurrentPeerList = append(CurrentPeerList, *newPeer)
+
+	// write it back
 	_, _ = w.Write([]byte(sb.String()))
 
 }
@@ -70,6 +72,7 @@ func Upload(w http.ResponseWriter, r *http.Request) {
 
 }
 
+// gets block at /block/{height}/{hash}
 func ReturnBlock(w http.ResponseWriter, r *http.Request) {
 
 }
