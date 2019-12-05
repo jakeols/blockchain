@@ -38,7 +38,9 @@ func (c *BlockChain) Insert(block Block) error {
 
 		c.Chain[height] = append(location, block)
 
-		c.Length = int32(len(c.Chain))
+		if block.Header.Height > c.Length {
+			c.Length = block.Header.Height
+		}
 		return nil
 
 	}
@@ -81,13 +83,19 @@ func (c BlockChain) GetLatestBlocks(height int32) ([]Block, error) {
 
 }
 
-// creates a genesis block, adds it to chain
-func (c BlockChain) GenesisBlock() {
+func (c BlockChain) GetParentBlock(b Block) (Block, error) {
+	parentHash := b.Header.ParentHash
+	parentHeight := b.Header.Height - 1
+	blocks := c.Get(parentHeight)
+	if blocks == nil {
+		return Block{}, errors.New("can't find parent blocks ")
+	}
 
+	for _, b := range blocks {
+		if b.Header.Hash == parentHash {
+			return b, nil
+		}
+	}
+
+	return Block{}, errors.New("genesis block")
 }
-
-// func (c BlockChain) GetParentBlock(b Block) Block {
-// 	parentHeight := b.Header.Height - 1
-
-// 	return c.Chain[parentHeight]
-// }

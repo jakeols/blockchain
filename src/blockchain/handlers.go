@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/json"
+	"fmt"
 	"io/ioutil"
 	"net/http"
 	"strings"
@@ -12,10 +13,38 @@ import (
 
 var SELF_ADDRESS string
 
+var running bool
+
 func InitSelfAddress(port string) {
 	SELF_ADDRESS = "http://localhost:" + port
 }
 
+// the main stuff here, starts up with tryinc nonces
+func StartTryingNonces() {
+	running = true
+	for {
+		startingBlocks := CurrentBlockChain.Get(CurrentBlockChain.Length)
+
+		fmt.Println(CurrentBlockChain.Length)
+		if len(startingBlocks) > 0 {
+			// get the parent block hash
+			parentBlock, _ := CurrentBlockChain.GetParentBlock(startingBlocks[0])
+			fmt.Println(parentBlock)
+			// create a new block
+			newBlock := new(data.Block)
+			newBlock.Initial(parentBlock.Header.Height+1, parentBlock.Header.Hash, "value")
+			CurrentBlockChain.Insert(*newBlock)
+
+		} else {
+			// create a new block
+			newBlock := new(data.Block)
+			newBlock.Initial(1, "test", "value")
+			CurrentBlockChain.Insert(*newBlock)
+		}
+
+	}
+
+}
 func readRequestBody(r *http.Request) (string, error) {
 	reqBody, err := ioutil.ReadAll(r.Body)
 	if err != nil {
@@ -60,7 +89,12 @@ func Register(w http.ResponseWriter, r *http.Request) {
 }
 
 func Start(w http.ResponseWriter, r *http.Request) {
-
+	if !running {
+		go StartTryingNonces()
+		w.WriteHeader(http.StatusOK)
+	} else {
+		w.WriteHeader(http.StatusBadRequest)
+	}
 }
 
 // returns blockchain
