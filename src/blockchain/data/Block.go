@@ -69,7 +69,6 @@ func FindNonce(parentHash string, value string) int {
 		hash.Reset()
 
 	}
-	fmt.Println("nonce found")
 	return counter
 }
 

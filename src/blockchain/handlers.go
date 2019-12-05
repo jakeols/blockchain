@@ -24,15 +24,13 @@ func StartTryingNonces() {
 	running = true
 	for {
 		startingBlocks := CurrentBlockChain.Get(CurrentBlockChain.Length)
-
-		fmt.Println(CurrentBlockChain.Length)
 		if len(startingBlocks) > 0 {
 			// get the parent block hash
-			parentBlock, _ := CurrentBlockChain.GetParentBlock(startingBlocks[0])
-			fmt.Println(parentBlock)
+			parentBlock, _ := CurrentBlockChain.GetParentBlock(startingBlocks[len(startingBlocks)-1])
+			fmt.Println(parentBlock.Header.Timestamp)
 			// create a new block
 			newBlock := new(data.Block)
-			newBlock.Initial(parentBlock.Header.Height+1, parentBlock.Header.Hash, "value")
+			newBlock.Initial(CurrentBlockChain.Length+1, parentBlock.Header.ParentHash, "value")
 			CurrentBlockChain.Insert(*newBlock)
 
 		} else {
