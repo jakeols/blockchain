@@ -9,9 +9,9 @@ import (
 )
 
 var CurrentPeerList = data.PeerList{}
+var CurrentBlockChain = data.BlockChain{}
 
 func main() {
-
 	// create and start server
 	router := NewRouter()
 	var port string

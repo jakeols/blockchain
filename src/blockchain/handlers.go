@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/json"
 	"io/ioutil"
 	"net/http"
 	"strings"
@@ -41,6 +42,7 @@ func ReceiveBlock(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusMethodNotAllowed)
 }
 
+// register to peer list
 func Register(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
 	sb := strings.Builder{}
@@ -61,10 +63,10 @@ func Start(w http.ResponseWriter, r *http.Request) {
 
 // returns blockchain
 func Upload(w http.ResponseWriter, r *http.Request) {
-	// w.WriteHeader(http.StatusOK)
-	// if err := json.NewEncoder(w).Encode(CanonicalChain); err != nil {
-	// 	panic(err)
-	// }
+	w.WriteHeader(http.StatusOK)
+	if err := json.NewEncoder(w).Encode(CurrentBlockChain); err != nil {
+		panic(err)
+	}
 
 }
 
