@@ -5,6 +5,7 @@ import (
 	"encoding/hex"
 	"encoding/json"
 	"fmt"
+	"math/rand"
 	"strconv"
 	"strings"
 	"time"
@@ -49,7 +50,9 @@ func (b *Block) Initial(height int32, parentHash string, value string) {
 func FindNonce(parentHash string, value string) int {
 	var nonceFound bool = false
 	//var hashString string
-	var counter int = 0 // maybe make more random in future
+	rand.Seed(time.Now().UnixNano())
+	var counter int = rand.Intn(30) // maybe make more random in future
+
 	for nonceFound == false {
 
 		hash := sha256.New()

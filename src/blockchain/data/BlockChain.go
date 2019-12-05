@@ -1,8 +1,12 @@
 package data
 
 import (
+	"crypto/sha256"
+	"encoding/hex"
 	"encoding/json"
 	"errors"
+	"fmt"
+	"sort"
 )
 
 type BlockChain struct {
@@ -98,4 +102,50 @@ func (c BlockChain) GetParentBlock(b Block) (Block, error) {
 	}
 
 	return Block{}, errors.New("genesis block")
+}
+
+func (blockchain *BlockChain) Show() string {
+
+	rs := ""
+
+	var idList []int
+
+	for id := range blockchain.Chain {
+
+		idList = append(idList, int(id))
+
+	}
+
+	sort.Ints(idList)
+
+	for _, id := range idList {
+
+		var hashs []string
+
+		for _, block := range blockchain.Chain[int32(id)] {
+
+			hashs = append(hashs, block.Header.Hash+"<="+block.Header.ParentHash)
+
+		}
+
+		sort.Strings(hashs)
+
+		rs += fmt.Sprintf("%v: ", id)
+
+		for _, h := range hashs {
+
+			rs += fmt.Sprintf("%s, ", h)
+
+		}
+
+		rs += "\n"
+
+	}
+
+	sum := sha256.Sum256([]byte(rs))
+
+	rs = fmt.Sprintf("This is the BlockChain: %s\n", hex.EncodeToString(sum[:])) + rs
+
+	return rs
+
 }

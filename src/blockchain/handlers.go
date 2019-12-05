@@ -108,3 +108,10 @@ func Upload(w http.ResponseWriter, r *http.Request) {
 func ReturnBlock(w http.ResponseWriter, r *http.Request) {
 
 }
+
+func CanonicalChain(w http.ResponseWriter, r *http.Request) {
+	w.WriteHeader(http.StatusOK)
+	sb := strings.Builder{}
+	sb.WriteString(CurrentBlockChain.Show())
+	_, _ = w.Write([]byte(sb.String()))
+}

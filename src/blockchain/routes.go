@@ -44,4 +44,10 @@ var routes = Routes{
 		"/block/{height}/{hash}",
 		ReturnBlock,
 	},
+	Route{
+		"CanonicalChain",
+		"GET",
+		"/show",
+		CanonicalChain,
+	},
 }
