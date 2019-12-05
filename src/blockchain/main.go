@@ -9,7 +9,7 @@ import (
 )
 
 var CurrentPeerList = data.PeerList{}
-var CurrentBlockChain = data.BlockChain{}
+var CurrentBlockChain = data.SyncBlockChain{}
 
 func main() {
 

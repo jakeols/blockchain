@@ -2,7 +2,6 @@ package main
 
 import (
 	"encoding/json"
-	"fmt"
 	"io/ioutil"
 	"net/http"
 	"strconv"
@@ -24,25 +23,24 @@ func InitSelfAddress(port string) {
 // the main stuff here, starts up with tryinc nonces
 func StartTryingNonces() {
 	running = true
-	for {
-		startingBlocks := CurrentBlockChain.Get(CurrentBlockChain.Length)
-		if len(startingBlocks) > 0 {
-			// get the parent block hash
-			parentBlock, _ := CurrentBlockChain.GetParentBlock(startingBlocks[len(startingBlocks)-1])
-			fmt.Println(parentBlock.Header.Timestamp)
-			// create a new block
-			newBlock := new(data.Block)
-			newBlock.Initial(CurrentBlockChain.Length+1, parentBlock.Header.ParentHash, "value")
-			CurrentBlockChain.Insert(*newBlock)
+	height := CurrentBlockChain.GetChainHeight()
+	startingBlocks := CurrentBlockChain.Get(height)
+	if len(startingBlocks) > 0 {
+		// get the parent block hash
+		parentBlock := CurrentBlockChain.GetParentBlock(startingBlocks[len(startingBlocks)-1])
+		// create a new block
+		newBlock := new(data.Block)
+		newBlock.Initial(height+1, parentBlock.Header.ParentHash, "value")
+		CurrentBlockChain.Insert(*newBlock)
 
-		} else {
-			// create a new block
-			newBlock := new(data.Block)
-			newBlock.Initial(1, "test", "value")
-			CurrentBlockChain.Insert(*newBlock)
-		}
-
+	} else {
+		// create a new block
+		newBlock := new(data.Block)
+		newBlock.Initial(1, "test", "value")
+		CurrentBlockChain.Insert(*newBlock)
 	}
+
+	StartTryingNonces()
 
 }
 func readRequestBody(r *http.Request) (string, error) {

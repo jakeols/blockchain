@@ -63,7 +63,7 @@ func FindNonce(parentHash string, value string) int {
 		n := strings.Trim(s, "[]")
 		t := strings.Replace(n, " ", "", -1)
 		// determine if it starts with 10 0's
-		if strings.HasPrefix(t, strings.Repeat("0", 10)) {
+		if strings.HasPrefix(t, strings.Repeat("0", 20)) {
 			nonceFound = true
 			break
 		}
@@ -84,7 +84,7 @@ func CheckNonce(nonce int, parentHash string, value string) bool {
 	n := strings.Trim(s, "[]")
 	t := strings.Replace(n, " ", "", -1)
 
-	if strings.HasPrefix(t, strings.Repeat("0", 10)) {
+	if strings.HasPrefix(t, strings.Repeat("0", 20)) {
 		return true
 	}
 	return false
