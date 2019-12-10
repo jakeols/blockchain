@@ -1,2 +1,2 @@
 # blockchain
-A micro blockchain, in Go. 
+A micro proof-of-work blockchain, in Go. 
